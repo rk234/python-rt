@@ -6,6 +6,6 @@ WIDTH = 600
 HEIGHT = 400
 
 cam = Camera(Vec3(0,0,0), Vec3(0,0,1), 1.0, Vec3(WIDTH, HEIGHT, 0))
-out = render_scene(WIDTH, HEIGHT, cam, 1)
+out = render_scene(WIDTH, HEIGHT, cam, 10)
 
 out.save("out.png")

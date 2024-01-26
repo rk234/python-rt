@@ -44,14 +44,16 @@ def render_scene(img_width: int, img_height: int, camera: Camera, samples: int) 
     out_img = Image.new(mode="RGB", size=(img_width, img_height))
     accumulation_buffer = [Vec3(0,0,0)]*(img_height*img_width)
 
-    for _ in range(samples):
+    for s in range(samples):
+        print(f"Sample {s+1}/{samples}...", end="")
         for x in range(img_width):
             for y in range(img_height):
                 camera.update_viewport(img_width, img_height)
                 ray = camera.gen_primary_ray(x, y, img_width, img_height)
                 
                 accumulation_buffer[x+y*img_width] = accumulation_buffer[x+y*img_width].add(sky_color(ray))
-    
+        print("Done!")
+
     for x in range(img_width):
         for y in range(img_height):
             out_img.putpixel((x,y), vec_to_rgb(accumulation_buffer[x+y*img_width].scale(1/samples)))
