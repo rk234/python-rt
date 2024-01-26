@@ -1,6 +1,11 @@
 from math_utils import Vec3
+from rendering import render_scene, Camera
+from PIL import Image
 
-vec = Vec3(0, 0, 0)
-vec2 = Vec3(1, 1, -1)
+WIDTH = 600
+HEIGHT = 400
 
-print(vec.add(vec2))
+cam = Camera(Vec3(0,0,0), Vec3(0,0,1), 1.0, Vec3(WIDTH, HEIGHT, 0))
+out = render_scene(WIDTH, HEIGHT, cam, 1)
+
+out.save("out.png")
