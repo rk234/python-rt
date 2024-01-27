@@ -13,5 +13,7 @@ If time permits:
 8. Ray-Plane intersection
 
 Day 1: 1, 2, 3
+
 Day 2: 4, 5
+
 Day 3: 6, 7, 8

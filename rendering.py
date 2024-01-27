@@ -12,6 +12,8 @@ class Ray:
     def at(self, t: float) -> Vec3:
         return self.origin.add(self.dir.scale(t))
 
+from scene import Scene
+
 class Camera:
     pos: Vec3
     dir: Vec3
@@ -40,7 +42,7 @@ class Camera:
         return Ray(self.pos, ray_dir)
 
 
-def render_scene(img_width: int, img_height: int, camera: Camera, samples: int) -> Image:
+def render_scene(scene: Scene, img_width: int, img_height: int, camera: Camera, samples: int) -> Image:
     out_img = Image.new(mode="RGB", size=(img_width, img_height))
     accumulation_buffer = [Vec3(0,0,0)]*(img_height*img_width)
 
@@ -50,8 +52,12 @@ def render_scene(img_width: int, img_height: int, camera: Camera, samples: int) 
             for y in range(img_height):
                 camera.update_viewport(img_width, img_height)
                 ray = camera.gen_primary_ray(x, y, img_width, img_height)
-                
-                accumulation_buffer[x+y*img_width] = accumulation_buffer[x+y*img_width].add(sky_color(ray))
+                hit = scene.intersect(ray)
+
+                if hit is not None:
+                    accumulation_buffer[x+y*img_width] = accumulation_buffer[x+y*img_width].add((hit.normal+Vec3(1,1,1)).scale(0.5))
+                else:
+                    accumulation_buffer[x+y*img_width] = accumulation_buffer[x+y*img_width].add(sky_color(ray))
         print("Done!")
 
     for x in range(img_width):

@@ -49,6 +49,9 @@ class Vec3():
     def normalize(self) -> Self:
         return self.scale(1/self.magnitude())
     
+    def distance(self, other: Self) -> float:
+        return self.subtract(other).magnitude()
+    
     def __str__(self) -> str:
         return f"Vec3({self.x}, {self.y}, {self.z})"
     
