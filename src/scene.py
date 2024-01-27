@@ -57,7 +57,7 @@ class Sphere(SceneObject):
     def intersect(self, ray: Ray) -> HitData | None:
         oc = ray.origin - self.position
 
-        a = ray.dir.dot(ray.dir)
+        a = 1
         b = 2 * oc.dot(ray.dir)
         c = oc.dot(oc) - (self.radius * self.radius)
 

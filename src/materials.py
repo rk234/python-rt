@@ -1,7 +1,9 @@
-from math_utils import Ray, Vec3, rand_vec_in_unit_hemisphere, rand_vec_in_unit_sphere
 from typing import Optional
 
+from math_utils import Ray, Vec3, rand_vec_in_unit_hemisphere, rand_vec_in_unit_sphere
+
 EPSILON = 0.0001
+
 
 class Material:
     def emissive(self) -> bool:
@@ -15,7 +17,7 @@ class Material:
 
 
 class DiffuseMaterial(Material):
-    albedo: Vec3 # color
+    albedo: Vec3  # color
 
     def __init__(self, albedo: Vec3):
         self.albedo = albedo
@@ -28,6 +30,7 @@ class DiffuseMaterial(Material):
 
     def attenuation(self) -> Vec3:
         return self.albedo
+
 
 class EmissiveMaterial(Material):
     emit: Vec3
@@ -64,4 +67,3 @@ class MetalMaterial(Material):
 
     def attenuation(self) -> Vec3:
         return self.albedo
-

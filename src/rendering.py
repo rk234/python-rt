@@ -1,3 +1,5 @@
+import math
+
 from math_utils import Vec3, rand_float, Ray
 from PIL import Image
 from scene import Scene
@@ -45,7 +47,7 @@ class Camera:
             self.cached_ray_directions[i] = ray_dir
         else:
             ray_dir = self.cached_ray_directions[i].add(adjacent.scale(rand_float(-0.5, 0.5) / screen_width)).add(
-                local_up.scale(rand_float(-0.5, 0.5) / screen_height))
+                local_up.scale(rand_float(-0.5, 0.5) / screen_height)).normalize()
 
         return Ray(self.pos, ray_dir)
 
@@ -87,14 +89,14 @@ def cast(scene: Scene, ray: Ray, depth: int) -> Vec3:
         else:
             return mat.attenuation().multiply(cast(scene, mat.scatter(ray, normal, p), depth - 1))
     else:
-        return Vec3(0, 0, 0)  # sky_color(ray)
+        return sky_color(ray)
 
 
 def vec_to_rgb(vec: Vec3) -> (int, int, int):
     return (
-        int(vec.x * 255),
-        int(vec.y * 255),
-        int(vec.z * 255)
+        int(math.sqrt(vec.x) * 255),
+        int(math.sqrt(vec.y) * 255),
+        int(math.sqrt(vec.z) * 255)
     )
 
 
