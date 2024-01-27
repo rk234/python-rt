@@ -1,16 +1,18 @@
-from math_utils import Vec3
-from rendering import Ray
+from math_utils import Vec3, Ray
 from typing import Optional
 import math
+from materials import Material
 
 
 class HitData:
     pos: Vec3
     normal: Vec3
+    material: Material
 
-    def __init__(self, pos: Vec3, normal: Vec3):
+    def __init__(self, pos: Vec3, normal: Vec3, material: Material):
         self.pos = pos
         self.normal = normal
+        self.material = material
 
 
 class SceneObject:
@@ -45,10 +47,12 @@ class Scene:
 class Sphere(SceneObject):
     position: Vec3
     radius: float
+    material: Material
 
-    def __init__(self, position: Vec3, radius: float):
+    def __init__(self, position: Vec3, radius: float, material: Material):
         self.position = position
         self.radius = radius
+        self.material = material
 
     def intersect(self, ray: Ray) -> HitData | None:
         oc = ray.origin - self.position
@@ -66,7 +70,7 @@ class Sphere(SceneObject):
 
             if t >= 0:
                 p = ray.at(t)
-                return HitData(p, (p - self.position).normalize())
+                return HitData(p, (p - self.position).normalize(), self.material)
             else:
                 return None
         else:

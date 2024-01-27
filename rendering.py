@@ -1,21 +1,6 @@
-from math_utils import Vec3, rand_float
+from math_utils import Vec3, rand_float, Ray
 from PIL import Image
-
-
-class Ray:
-    origin: Vec3
-    dir: Vec3
-
-    def __init__(self, origin: Vec3, dir: Vec3) -> None:
-        self.origin = origin
-        self.dir = dir.normalize()
-
-    def at(self, t: float) -> Vec3:
-        return self.origin.add(self.dir.scale(t))
-
-
 from scene import Scene
-
 
 class Camera:
     pos: Vec3
@@ -48,7 +33,7 @@ class Camera:
         return Ray(self.pos, ray_dir)
 
 
-def render_scene(scene: Scene, img_width: int, img_height: int, camera: Camera, samples: int) -> Image:
+def render_scene(scene: Scene, img_width: int, img_height: int, camera: Camera, samples: int, num_bounces: int = 4) -> Image:
     out_img = Image.new(mode="RGB", size=(img_width, img_height))
     accumulation_buffer = [Vec3(0, 0, 0)] * (img_height * img_width)
 
@@ -58,13 +43,7 @@ def render_scene(scene: Scene, img_width: int, img_height: int, camera: Camera, 
             for y in range(img_height):
                 camera.update_viewport(img_width, img_height)
                 ray = camera.gen_primary_ray(x, y, img_width, img_height)
-                hit = scene.intersect(ray)
-
-                if hit is not None:
-                    accumulation_buffer[x + y * img_width] = accumulation_buffer[x + y * img_width].add(
-                        (hit.normal + Vec3(1, 1, 1)).scale(0.5))
-                else:
-                    accumulation_buffer[x + y * img_width] = accumulation_buffer[x + y * img_width].add(sky_color(ray))
+                accumulation_buffer[x + y * img_width] = accumulation_buffer[x + y * img_width].add(cast(scene, ray, num_bounces))
         print("Done!")
 
     for x in range(img_width):
@@ -73,6 +52,20 @@ def render_scene(scene: Scene, img_width: int, img_height: int, camera: Camera, 
 
     return out_img
 
+
+def cast(scene: Scene, ray: Ray, depth: int) -> Vec3:
+    if depth < 0:
+        return Vec3(0, 0, 0)
+
+    hit = scene.intersect(ray)
+    if hit is not None:
+        p = hit.pos
+        mat = hit.material
+        normal = hit.normal
+
+        return mat.attenuation().multiply(cast(scene, mat.scatter(ray, normal, p), depth-1))
+    else:
+        return sky_color(ray)
 
 def vec_to_rgb(vec: Vec3) -> (int, int, int):
     return (

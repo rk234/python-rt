@@ -2,8 +2,7 @@ from typing import Self
 import math
 import random
 
-
-class Vec3():
+class Vec3:
     x: float
     y: float
     z: float
@@ -59,3 +58,37 @@ class Vec3():
 
 def rand_float(lower_bound: float, upper_bound: float) -> float:
     return lower_bound + (random.random() * (upper_bound - lower_bound))
+
+
+def rand_vec() -> Vec3:
+    return Vec3(rand_float(-1, 1), rand_float(-1, 1), rand_float(-1, 1))
+
+
+def rand_vec_in_unit_sphere() -> Vec3:
+    vec = rand_vec()
+
+    while vec.magnitude() > 1:
+        vec = rand_vec()
+
+    return vec.normalize()
+
+
+def rand_vec_in_unit_hemisphere(normal: Vec3) -> Vec3:
+    vec = rand_vec_in_unit_sphere()
+
+    if vec.dot(normal) > 0:
+        return vec
+    else:
+        return vec.scale(-1)
+
+
+class Ray:
+    origin: Vec3
+    dir: Vec3
+
+    def __init__(self, origin: Vec3, dir: Vec3) -> None:
+        self.origin = origin
+        self.dir = dir.normalize()
+
+    def at(self, t: float) -> Vec3:
+        return self.origin.add(self.dir.scale(t))
