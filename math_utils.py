@@ -86,9 +86,9 @@ class Ray:
     origin: Vec3
     dir: Vec3
 
-    def __init__(self, origin: Vec3, dir: Vec3) -> None:
+    def __init__(self, origin: Vec3, direction: Vec3) -> None:
         self.origin = origin
-        self.dir = dir.normalize()
+        self.dir = direction.normalize()
 
     def at(self, t: float) -> Vec3:
         return self.origin.add(self.dir.scale(t))

@@ -3,7 +3,7 @@ from rendering import render_scene, Camera
 from scene import Scene, Sphere
 from materials import DiffuseMaterial
 
-HEIGHT = 256
+HEIGHT = 400
 WIDTH = int(HEIGHT*(16/9))
 
 

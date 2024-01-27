@@ -67,6 +67,7 @@ def cast(scene: Scene, ray: Ray, depth: int) -> Vec3:
     else:
         return sky_color(ray)
 
+
 def vec_to_rgb(vec: Vec3) -> (int, int, int):
     return (
         int(vec.x * 255),
