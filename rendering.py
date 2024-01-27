@@ -1,12 +1,15 @@
 from math_utils import Vec3, rand_float, Ray
 from PIL import Image
 from scene import Scene
+from typing import Optional
+
 
 class Camera:
     pos: Vec3
     dir: Vec3
     near_plane: float  # near plane distance
     viewport_size: Vec3  # size of the viewport
+    cached_ray_directions: list[Optional[Vec3]]
 
     def __init__(self, pos: Vec3, dir: Vec3, near_plane: float, viewport_size: Vec3) -> None:
         self.pos = pos
@@ -15,6 +18,7 @@ class Camera:
         self.viewport_size = viewport_size
 
     def update_viewport(self, screen_width: float, screen_height: float):
+        self.cached_ray_directions = [None] * int(screen_width * screen_height)
         self.viewport_size = Vec3(
             (screen_width / screen_height) * 1.5,
             1.5,
@@ -25,25 +29,40 @@ class Camera:
         adjacent = Vec3(0, 1, 0).cross(self.dir).normalize()
         local_up = adjacent.cross(self.dir).normalize()
         bottom_left = adjacent.scale(-self.viewport_size.x / 2).add(local_up.scale(-self.viewport_size.y / 2))
+        """
         ray_dir = bottom_left.add(
             adjacent.scale(self.viewport_size.x) * ((screen_x + rand_float(-0.5, 0.5)) / screen_width)).add(
             local_up.scale((self.viewport_size.y) * ((screen_y + rand_float(-0.5, 0.5)) / screen_height))).add(
             self.dir.scale(self.near_plane)).normalize()
+        """
+        i = int(screen_x + screen_width * screen_y)
+        ray_dir = None
+        if self.cached_ray_directions[i] is None:
+            ray_dir = bottom_left.add(
+                adjacent.scale(self.viewport_size.x * (screen_x / screen_width))).add(
+                local_up.scale(self.viewport_size.y * (screen_y / screen_height))).add(
+                self.dir.scale(self.near_plane)).normalize()
+            self.cached_ray_directions[i] = ray_dir
+        else:
+            ray_dir = self.cached_ray_directions[i].add(adjacent.scale(rand_float(-0.5, 0.5) / screen_width)).add(
+                local_up.scale(rand_float(-0.5, 0.5) / screen_height))
 
         return Ray(self.pos, ray_dir)
 
 
-def render_scene(scene: Scene, img_width: int, img_height: int, camera: Camera, samples: int, num_bounces: int = 4) -> Image:
+def render_scene(scene: Scene, img_width: int, img_height: int, camera: Camera, samples: int,
+                 num_bounces: int = 3) -> Image:
     out_img = Image.new(mode="RGB", size=(img_width, img_height))
     accumulation_buffer = [Vec3(0, 0, 0)] * (img_height * img_width)
+    camera.update_viewport(img_width, img_height)
 
     for s in range(samples):
         print(f"Sample {s + 1}/{samples}...", end="")
         for x in range(img_width):
             for y in range(img_height):
-                camera.update_viewport(img_width, img_height)
                 ray = camera.gen_primary_ray(x, y, img_width, img_height)
-                accumulation_buffer[x + y * img_width] = accumulation_buffer[x + y * img_width].add(cast(scene, ray, num_bounces))
+                accumulation_buffer[x + y * img_width] = accumulation_buffer[x + y * img_width].add(
+                    cast(scene, ray, num_bounces))
         print("Done!")
 
     for x in range(img_width):
@@ -63,9 +82,12 @@ def cast(scene: Scene, ray: Ray, depth: int) -> Vec3:
         mat = hit.material
         normal = hit.normal
 
-        return mat.attenuation().multiply(cast(scene, mat.scatter(ray, normal, p), depth-1))
+        if mat.emissive():
+            return mat.attenuation()
+        else:
+            return mat.attenuation().multiply(cast(scene, mat.scatter(ray, normal, p), depth - 1))
     else:
-        return sky_color(ray)
+        return Vec3(0, 0, 0)  # sky_color(ray)
 
 
 def vec_to_rgb(vec: Vec3) -> (int, int, int):

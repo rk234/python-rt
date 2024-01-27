@@ -2,6 +2,7 @@ from typing import Self
 import math
 import random
 
+
 class Vec3:
     x: float
     y: float
@@ -51,6 +52,9 @@ class Vec3:
 
     def distance(self, other: Self) -> float:
         return self.subtract(other).magnitude()
+
+    def reflect(self, normal: Self) -> Self:
+        return self.subtract(normal.scale(2 * self.dot(normal)))
 
     def __str__(self) -> str:
         return f"Vec3({self.x}, {self.y}, {self.z})"
