@@ -1,9 +1,11 @@
 from materials import DiffuseMaterial, EmissiveMaterial, MetalMaterial
 from math_utils import Vec3
-from rendering import render_scene, Camera
+from rendering import render_scene
+from camera import Camera
 from scene import Scene, Sphere
 
-HEIGHT = 400
+
+HEIGHT = 256
 WIDTH = int(HEIGHT * (16 / 9))
 
 scene = Scene()
