@@ -9,7 +9,9 @@ The `math_utils` file should be copy-pasted at the start of the lessons, no need
 5. The Sphere class & Ray-Sphere intersection + normal vectors
 6. Abstract material class and Lambertian (diffuse) material
 7. Metal material and Emissive material (Light sources)
-If time permits:
+
+#### *If time permits:*
+
 8. Ray-Plane intersection
 
 Day 1: 1, 2, 3
