@@ -1,6 +1,7 @@
 from typing import Optional
-
 from math_utils import Vec3, rand_float, Ray
+
+
 class Camera:
     pos: Vec3
     dir: Vec3
@@ -40,8 +41,8 @@ class Camera:
                 local_up.scale(self.viewport_size.y * (screen_y / screen_height))).add(
                 self.dir.scale(self.near_plane)).normalize()
             self.cached_ray_directions[i] = ray_dir
-        else:
-            ray_dir = self.cached_ray_directions[i].add(adjacent.scale(rand_float(-0.5, 0.5) / screen_width)).add(
-                local_up.scale(rand_float(-0.5, 0.5) / screen_height)).normalize()
+
+        ray_dir = self.cached_ray_directions[i].add(adjacent.scale(rand_float(-0.5, 0.5) / screen_width)).add(
+            local_up.scale(rand_float(-0.5, 0.5) / screen_height)).normalize()
 
         return Ray(self.pos, ray_dir)
